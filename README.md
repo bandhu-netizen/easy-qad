@@ -1,21 +1,11 @@
 # Easy QAD
 
-Single-file referral follow-up desk. Open [easy-qad.html](./easy-qad.html) in a browser. Nothing to install, and nothing is sent to a server.
+Open the desk in the browser (this stays on the page after sign-in; it does not download):
 
-Cases, notes, and follow-up status stay in that browser (`localStorage` key `easyqad.v1`). Sign-in is remembered for the tab (`sessionStorage`).
+https://bandhu-netizen.github.io/easy-qad/
 
-## What it does
+`easy-qad.html` is the same file if you want a local copy. Open that copy in a browser. Sign-in stays on this page.
 
-- Import CSV or Excel and merge onto the people already on the desk (notes and follow-up stay)
-- Queue late, due-today, and untouched cases first
-- Filter by follow-up status, source status, marketer, and priority without losing the selection
-- Work a case: status, next date, priority, assignee, notes
-- Export the current view to Excel
-- Load a small fictional sample caseload
+Cases stay in the browser. Nothing is sent to a server.
 
 Developed by Zulkarnyn Savy and Bandhu Dhrubo.
-
-## Download
-
-- File: https://github.com/bandhu-netizen/easy-qad/raw/refs/heads/main/easy-qad.html
-- Zip: https://github.com/bandhu-netizen/easy-qad/archive/refs/heads/main.zip
