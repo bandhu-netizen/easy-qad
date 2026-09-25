@@ -1,10 +1,8 @@
 # Easy QAD
 
-Sign-in stays on this page. It does not download the file.
+Save `easy-qad.html` and open that file in the browser. Sign-in stays on the page. It does not download the file again.
 
-Open the file in a browser after you save it, or use the hosted page:
-
-https://cdn.jsdelivr.net/gh/bandhu-netizen/easy-qad@main/index.html
+GitHub's raw link only shows the source. Use the saved file.
 
 Cases stay in the browser. Nothing is sent to a server.
 
