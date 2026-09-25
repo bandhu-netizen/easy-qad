@@ -1,10 +1,10 @@
 # Easy QAD
 
-Open the desk in the browser (this stays on the page after sign-in; it does not download):
+Sign-in stays on this page. It does not download the file.
 
-https://bandhu-netizen.github.io/easy-qad/
+Open the file in a browser after you save it, or use the hosted page:
 
-`easy-qad.html` is the same file if you want a local copy. Open that copy in a browser. Sign-in stays on this page.
+https://cdn.jsdelivr.net/gh/bandhu-netizen/easy-qad@main/index.html
 
 Cases stay in the browser. Nothing is sent to a server.
 
