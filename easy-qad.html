@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Easy QAD</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--paper:#f3f0e8;--surface:#fffdf8;--ink:#1b2430;--muted:#4e5c6b;--line:#e3dacb;--navy:#173056;--navy-line:#2d4a73;--navy-muted:#c5d0de;--on-navy:#f4f0e6;--primary:#1e4b86;--primary-fg:#f7f4ec;--wash:#e6eef8;--brass:#8a5a00;--brass-soft:#f8efd6;--pine:#1c6b43;--pine-soft:#e3f3ea;--brick:#9c3419;--brick-soft:#fbe8e2}
+*{box-sizing:border-box}html{-webkit-font-smoothing:antialiased}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 "IBM Plex Sans",ui-sans-serif,system-ui,sans-serif}button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}h1,h2{text-wrap:balance}
+.top{background:var(--navy);color:var(--on-navy)}.top-inner{max-width:1500px;margin:auto;padding:16px 20px;display:flex;gap:16px;justify-content:space-between;align-items:center;flex-wrap:wrap}.mark{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--navy-line);border-radius:8px;font-family:ui-monospace,monospace}.rule{height:4px;background:var(--brass)}
+.wrap{max-width:1500px;margin:auto;padding:20px}
+.btn{height:44px;border:0;border-radius:8px;padding:0 14px;font-weight:650;display:inline-flex;align-items:center;gap:8px}.primary{background:var(--primary);color:var(--primary-fg)}.light{background:var(--primary-fg);color:var(--navy)}.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--line)}.quiet{background:transparent;color:var(--on-navy);border:1px solid var(--navy-line)}
+.file{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}.stat{background:var(--surface);text-align:left;padding:12px 14px}.stat.on{background:var(--wash)}.stat b{display:block;font-size:24px;font-variant-numeric:tabular-nums}.stat span{color:var(--muted);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.chips{display:flex;gap:8px;overflow:auto;margin-top:12px}.chip{height:44px;border-radius:999px;border:1px solid var(--line);background:var(--surface);padding:0 12px;font-weight:650;white-space:nowrap}.chip.on{background:var(--navy);color:var(--on-navy);border-color:var(--navy)}
+.tools{display:grid;gap:8px;margin-top:12px}.tools input,.tools select,textarea.note{height:44px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 12px;width:100%}textarea.note{height:auto;min-height:88px;padding:10px 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse}th,td{padding:12px;text-align:left;border-top:1px solid var(--line);vertical-align:middle}th{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border-top:0}tbody tr{cursor:pointer}tbody tr:hover{background:var(--wash)}
+.badge{display:inline-flex;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:650}.neutral{background:var(--line);color:var(--ink)}.action{background:var(--wash);color:var(--primary)}.wait{background:var(--brass-soft);color:var(--brass)}.good{background:var(--pine-soft);color:var(--pine)}.bad{background:var(--brick-soft);color:var(--brick)}.late{color:var(--brick);font-weight:700}.today{color:var(--brass);font-weight:700}
+.next{margin-top:16px;padding:16px;display:grid;gap:12px}.mono{font-family:ui-monospace,monospace;font-size:12px}
+dialog{border:0;padding:0;width:min(640px,calc(100% - 24px));border-radius:12px;box-shadow:0 24px 60px #10182855}dialog::backdrop{background:#10182888}.sheet{width:min(560px,100%);height:100%;max-height:100%;margin-left:auto;border-radius:0}
+.head,.foot{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}.foot{border-bottom:0;border-top:1px solid var(--line);justify-content:flex-end}.body{padding:16px 20px;max-height:70vh;overflow:auto}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.label{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.note-item{border-left:2px solid var(--line);padding:8px 12px;margin:10px 0}.login{min-height:100vh;display:grid}.hero{background:var(--navy);color:var(--on-navy);padding:40px 28px;display:flex;flex-direction:column;justify-content:space-between}.form{padding:40px 28px;display:flex;align-items:center}.form form{width:min(360px,100%);margin:auto}
+.form input,.grid select,.grid input{height:44px;width:100%;border:1px solid var(--line);border-radius:8px;padding:0 12px;background:#fffdf8;margin-top:6px}
+.credit{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.4rem .55rem;border-radius:999px;padding:.2rem .15rem;color:var(--navy-muted);cursor:default;transition:background-color .22s ease,color .22s ease,padding .22s ease}
+.credit:hover,.credit:focus-visible{background:color-mix(in srgb,var(--brass) 22%,transparent);color:var(--on-navy);padding-inline:.7rem;outline:none}
+.credit-kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.credit-lockup{position:relative;display:inline-flex;flex-wrap:wrap;align-items:center;gap:.35rem;overflow:hidden}
+.credit-mark{display:inline-grid;width:0;height:1.25rem;place-items:center;overflow:hidden;opacity:0;border:1px solid transparent;border-radius:4px;color:var(--brass);font-family:ui-monospace,monospace;font-size:11px;transition:width .32s ease,opacity .32s ease,border-color .32s ease}
+.credit:hover .credit-mark,.credit:focus-visible .credit-mark{width:1.25rem;opacity:1;border-color:var(--brass)}
+.credit-name{position:relative;font-weight:650}.credit-name::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:1px;background:linear-gradient(90deg,transparent,var(--brass),#f6e7c2,var(--brass),transparent);transform:scaleX(0);transform-origin:left;transition:transform .42s cubic-bezier(.2,.8,.2,1)}
+.credit:hover .credit-name::after,.credit:focus-visible .credit-name::after{transform:scaleX(1)}.credit:hover .credit-name:last-of-type::after{transition-delay:.12s}
+.credit-sheen{position:absolute;top:-20%;bottom:-20%;left:0;width:40%;background:linear-gradient(105deg,transparent,#f6e7c2cc,transparent);transform:translateX(-180%);pointer-events:none}
+.credit:hover .credit-sheen,.credit:focus-visible .credit-sheen{animation:sheen .9s ease}@keyframes sheen{to{transform:translateX(420%)}}
+.empty{padding:48px 16px;text-align:center}.err{color:var(--brick);min-height:20px}
+@media(min-width:900px){.login{grid-template-columns:1fr 1fr}.tools{grid-template-columns:1.4fr repeat(4,1fr)}}
+@media(max-width:899px){.stats{grid-template-columns:repeat(2,1fr)}.grid,.form-row{grid-template-columns:1fr}.table-wrap{display:none}.cards{display:block}}
+@media(min-width:900px){.cards{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="login" class="login">
+  <section class="hero">
+    <div>
+      <div style="display:flex;gap:12px;align-items:center"><span class="mark">Q</span><span>Referral follow-up desk</span></div>
+      <h1 style="font-size:40px;margin:28px 0 0">Easy QAD</h1>
+      <div class="rule" style="width:64px;margin-top:16px"></div>
+      <p style="max-width:420px;color:var(--navy-muted)">Work the referral list without losing the thread. Late cases rise to the top. Notes stay with the person.</p>
+    </div>
+    <span class="credit" tabindex="0"><span class="credit-kicker">Developed by</span><span class="credit-lockup"><span class="credit-mark">Z</span><span class="credit-name">Zulkarnyn Savy</span><span>and</span><span class="credit-mark">B</span><span class="credit-name">Bandhu Dhrubo</span><span class="credit-sheen"></span></span></span>
+  </section>
+  <section class="form">
+    <form id="loginForm">
+      <h2>Sign in</h2>
+      <p style="color:var(--muted);margin-top:4px">For the shared QAD desk.</p>
+      <label class="label" for="username" style="margin-top:24px">Username</label>
+      <input id="username" required autocomplete="username">
+      <label class="label" for="password" style="margin-top:14px">Password</label>
+      <input id="password" type="password" required autocomplete="current-password">
+      <p class="err" id="loginError"></p>
+      <button class="btn primary" style="width:100%" type="submit">Sign in</button>
+    </form>
+  </section>
+</div>
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-inner">
+      <div style="display:flex;gap:12px;align-items:center">
+        <span class="mark">Q</span>
+        <div><h1 style="font-size:18px;margin:0">Easy QAD</h1>
+          <span class="credit" tabindex="0"><span class="credit-kicker">Developed by</span><span class="credit-lockup"><span class="credit-mark">Z</span><span class="credit-name">Zulkarnyn Savy</span><span>and</span><span class="credit-mark">B</span><span class="credit-name">Bandhu Dhrubo</span><span class="credit-sheen"></span></span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <label class="btn light">Import<input id="file" class="file" type="file" accept=".csv,.xlsx,.xls"></label>
+        <button class="btn quiet" id="sampleBtn" type="button">Load sample</button>
+        <button class="btn quiet" id="exportBtn" type="button">Export view</button>
+        <button class="btn quiet" id="logoutBtn" type="button">Log out</button>
+      </div>
+    </div>
+    <div class="rule"></div>
+  </header>
+  <main class="wrap">
+    <section class="stats" id="stats"></section>
+    <div class="chips" id="chips"></div>
+    <section class="tools">
+      <input id="search" placeholder="Search patient, GCR, Medicaid, phone" aria-label="Search cases">
+      <select id="statusFilter" aria-label="Follow-up status"></select>
+      <select id="sourceFilter" aria-label="Source status"></select>
+      <select id="marketerFilter" aria-label="Marketer"></select>
+      <select id="priorityFilter" aria-label="Priority"><option value="">All priorities</option><option>High</option><option>Normal</option><option>Low</option></select>
+    </section>
+    <section class="card next" id="upnext"></section>
+    <section class="card table-wrap" style="margin-top:16px;overflow:auto"><table><thead><tr><th>Patient</th><th>GCR</th><th>Referral</th><th>Marketer</th><th>Follow-up</th><th>Next</th><th>Last action</th></tr></thead><tbody id="rows"></tbody></table></section>
+    <section class="cards" id="cards"></section>
+    <p id="empty" class="empty">Import a CSV or Excel file, or load the sample.</p>
+  </main>
+</div>
+<dialog id="sheet" class="sheet">
+  <form method="dialog" id="caseForm">
+    <div class="head"><div><h2 id="mName" style="margin:0"></h2><p id="mSub" style="margin:4px 0 0;color:var(--muted)"></p></div><button class="btn ghost" value="cancel" type="submit">Close</button></div>
+    <div class="body">
+      <div class="grid" id="facts"></div>
+      <div class="grid" style="margin-top:16px">
+        <label>Follow-up status<select id="editStatus"></select></label>
+        <label>Next follow-up<input id="nextDate" type="date"></label>
+        <label>Priority<select id="priority"><option>Normal</option><option>High</option><option>Low</option></select></label>
+        <label>Assigned to<input id="assigned" placeholder="Optional"></label>
+      </div>
+      <label style="display:block;margin-top:14px">Add note<textarea class="note" id="newNote" placeholder="What happened, and what should happen next."></textarea></label>
+      <div id="timeline"></div>
+    </div>
+    <div class="foot"><button class="btn ghost" value="cancel">Cancel</button><button class="btn primary" id="saveCase" value="default" type="button">Save</button></div>
+  </form>
+</dialog>
+<script>
+const FOLLOW=["Untouched","Call","Attempted – No Answer","Left Voicemail","Contacted","Follow Up Required","Scheduled Follow Up","Medicaid Review","Pending Documents","Hold","Accepted / Converted","Lost","Don't Call"];
+const CLOSED=new Set(["Accepted / Converted","Lost","Don't Call"]);
+const KEY="easyqad.v1";
+let cases=[], quick="all", activeId=null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"}[c]));
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+function addDays(iso,n){const [y,m,d]=iso.split("-").map(Number);const dt=new Date(y,(m||1)-1,d||1);dt.setDate(dt.getDate()+n);return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,"0")}-${String(dt.getDate()).padStart(2,"0")}`}
+function dayDiff(a,b){const A=a.split("-").map(Number),B=b.split("-").map(Number);return Math.round((new Date(B[0],B[1]-1,B[2])-new Date(A[0],A[1]-1,A[2]))/86400000)}
+function fmt(iso){if(!iso)return "—";const [y,m,d]=iso.split("-").map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"})}
+function toISO(v){if(v==null||v==="")return "";if(v instanceof Date&&!isNaN(v)){const z=v.getUTCHours()===0&&v.getUTCMinutes()===0;const d=z?v:new Date(v);const y=z?v.getUTCFullYear():d.getFullYear();const m=z?v.getUTCMonth()+1:d.getMonth()+1;const day=z?v.getUTCDate():d.getDate();return `${y}-${String(m).padStart(2,"0")}-${String(day).padStart(2,"0")}`}if(typeof v==="number"&&v>20000&&v<80000){const u=new Date(Math.round((v-25569)*86400*1000));return `${u.getUTCFullYear()}-${String(u.getUTCMonth()+1).padStart(2,"0")}-${String(u.getUTCDate()).padStart(2,"0")}`}const s=String(v).trim();let m=/^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(s);if(m)return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;m=/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})$/.exec(s);if(m){let y=+m[3];if(y<100)y+=2000;return `${y}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`}return ""}
+function norm(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function tone(s){if(s==="Call"||s==="Contacted")return "action";if(s==="Attempted – No Answer"||s==="Left Voicemail"||s==="Hold")return "wait";if(s==="Accepted / Converted")return "good";if(s==="Lost"||s==="Don't Call")return "bad";if(s==="Untouched")return "neutral";return "action"}
+function badge(s){return `<span class="badge ${tone(s)}">${esc(s||"Untouched")}</span>`}
+function uid(){return crypto.randomUUID?crypto.randomUUID():"id-"+Date.now()}
+function blank(p={}){return {id:uid(),patientName:"",gcrId:"",medicaid:"",phone:"",additional:"",marketer:"",referralDate:"",sourceStatus:"",callStatus:"",followStatus:"Untouched",priority:"Normal",assigned:"",nextDate:"",notes:[],lastAction:"",...p}}
+function idOf(c){const g=norm(c.gcrId);return g?`g:${g}`:`p:${norm(c.patientName)}|${norm(c.phone)}`}
+function save(){localStorage.setItem(KEY,JSON.stringify({version:1,cases}))}
+function load(){try{const p=JSON.parse(localStorage.getItem(KEY)||"null");cases=Array.isArray(p?.cases)?p.cases:[]}catch{cases=[]}}
+function closed(s){return CLOSED.has(s)}
+function rank(c,t){if(closed(c.followStatus))return 1e6;let r=800;if(c.nextDate&&c.nextDate<t)r=-5000-dayDiff(c.nextDate,t)*10;else if(c.nextDate===t)r=-2000;else if(!c.nextDate&&(c.followStatus==="Untouched"||c.followStatus==="Call"))r=-200;if(c.priority==="High")r-=250;if(c.referralDate)r-=Math.min(dayDiff(c.referralDate,t),45);return r}
+function nextLabel(c,t){if(closed(c.followStatus))return ["Closed","muted"];if(!c.nextDate)return ["Not set","none"];if(c.nextDate<t){const n=dayDiff(c.nextDate,t);return [n===1?"1 day late":`${n} days late`,"late"]}if(c.nextDate===t)return ["Due today","today"];const n=dayDiff(t,c.nextDate);return [n===1?"Tomorrow":`In ${n} days`,"soon"]}
+function match(c,t){const q=$("#search").value.trim().toLowerCase();if(q){const hay=[c.patientName,c.gcrId,c.medicaid,c.phone,c.marketer,c.sourceStatus,c.callStatus,c.followStatus,...(c.notes||[]).map(n=>n.text)].join(" ").toLowerCase();if(!hay.includes(q))return false}if($("#statusFilter").value&&c.followStatus!==$("#statusFilter").value)return false;if($("#sourceFilter").value&&c.sourceStatus!==$("#sourceFilter").value)return false;if($("#marketerFilter").value&&(c.marketer||"Unassigned")!==$("#marketerFilter").value)return false;if($("#priorityFilter").value&&c.priority!==$("#priorityFilter").value)return false;if(quick==="untouched")return c.followStatus==="Untouched";if(quick==="today")return !closed(c.followStatus)&&c.nextDate===t;if(quick==="overdue")return !closed(c.followStatus)&&c.nextDate&&c.nextDate<t;if(quick==="high")return c.priority==="High"&&!closed(c.followStatus);if(quick==="hold")return c.followStatus==="Hold";if(quick==="converted")return c.followStatus==="Accepted / Converted";if(quick==="closed")return closed(c.followStatus);return true}
+function pick(row, names){const keys=Object.keys(row);for(const n of names){const hit=keys.find(k=>norm(k)===n&&String(row[k]??"").trim()!=="");if(hit)return row[hit]}for(const n of names){const hit=keys.find(k=>norm(k)===n);if(hit)return row[hit]}return ""}
+function parseCsv(text){text=text.replace(/^\uFEFF/,"");const rows=[];let row=[],cell="",q=false;for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i++}else q=false}else cell+=ch;continue}if(ch==='"')q=true;else if(ch===","){row.push(cell);cell=""}else if(ch==="\n"){row.push(cell);rows.push(row);row=[];cell=""}else if(ch!=="\r")cell+=ch}if(cell||row.length){row.push(cell);rows.push(row)}const h=(rows.shift()||[]).map(x=>x.trim());return rows.filter(r=>r.some(c=>c.trim())).map(r=>{const o={};h.forEach((name,i)=>{if(name)o[name]=(r[i]||"").trim()});return o})}
+function rowsToCases(rows){const out=[],seen=new Map();rows.forEach(r=>{const c=blank({patientName:String(pick(r,["patientname","patient","name"])||"").trim(),gcrId:String(pick(r,["gcrid","gcr"])||"").trim(),medicaid:String(pick(r,["medicaid","medicaidnumber","medicaidid"])||"").trim(),phone:String(pick(r,["phonenumber","phone","telephone"])||"").trim(),additional:String(pick(r,["additionalcontact","contact"])||"").trim(),marketer:String(pick(r,["marketer"])||"").trim(),referralDate:toISO(pick(r,["referraldate","refferaldate","date"])),sourceStatus:String(pick(r,["status","sourcestatus"])||"").trim(),callStatus:String(pick(r,["callstatus"])||"").trim()});if(!c.patientName&&!c.gcrId&&!c.phone&&!c.medicaid)return;const k=idOf(c);if(seen.has(k))out[seen.get(k)]={...c,id:out[seen.get(k)].id};else{seen.set(k,out.length);out.push(c)}});return out}
+function merge(incoming){const map=new Map(cases.map(c=>[idOf(c),c]));incoming.forEach(inc=>{const prev=map.get(idOf(inc));if(prev)map.set(idOf(inc),{...prev,patientName:inc.patientName||prev.patientName,gcrId:inc.gcrId||prev.gcrId,medicaid:inc.medicaid||prev.medicaid,phone:inc.phone||prev.phone,additional:inc.additional||prev.additional,marketer:inc.marketer||prev.marketer,referralDate:inc.referralDate||prev.referralDate,sourceStatus:inc.sourceStatus||prev.sourceStatus,callStatus:inc.callStatus||prev.callStatus});else map.set(idOf(inc),inc)});cases=[...map.values()];save()}
+function sample(){const t=today();const ago=n=>addDays(t,-n);cases=[blank({patientName:"James Ebony",gcrId:"GCR-901068",phone:"917-660-2952",marketer:"Rajendranauth Persaud",referralDate:ago(10),sourceStatus:"Hold",callStatus:"Don't Call",followStatus:"Don't Call"}),blank({patientName:"Cameron Jacquelin",gcrId:"GCR-901035",phone:"929-290-8841",marketer:"Rajendranauth Persaud",referralDate:ago(10),sourceStatus:"Hold",callStatus:"Call",followStatus:"Call",priority:"High",nextDate:t}),blank({patientName:"Helen Cho",gcrId:"GCR-901166",medicaid:"NY3301928",phone:"917-555-0166",marketer:"Rajendranauth Persaud",referralDate:ago(21),sourceStatus:"Active",callStatus:"Call",followStatus:"Pending Documents",priority:"High",nextDate:ago(1)}),blank({patientName:"Bruce Carol",gcrId:"GCR-901024",phone:"917-589-3483",marketer:"MD Hussain",referralDate:ago(18),sourceStatus:"Lost",callStatus:"Call"})];save();render()}
+function filtered(){const t=today();return cases.filter(c=>match(c,t)).sort((a,b)=>rank(a,t)-rank(b,t))}
+function render(){const t=today();const list=filtered();const stat=[["all","Cases",cases.length],["untouched","Untouched",cases.filter(c=>c.followStatus==="Untouched").length],["today","Due today",cases.filter(c=>!closed(c.followStatus)&&c.nextDate===t).length],["overdue","Overdue",cases.filter(c=>!closed(c.followStatus)&&c.nextDate&&c.nextDate<t).length],["hold","On hold",cases.filter(c=>c.followStatus==="Hold").length],["converted","Converted",cases.filter(c=>c.followStatus==="Accepted / Converted").length]];$("#stats").innerHTML=stat.map(([k,l,n])=>`<button class="stat ${quick===k?"on":""}" data-q="${k}"><b>${n}</b><span>${l}</span></button>`).join("");const chips=[["all","All"],["untouched","Untouched"],["today","Due today"],["overdue","Overdue"],["high","High"],["hold","Hold"],["converted","Converted"],["closed","Closed"]];$("#chips").innerHTML=chips.map(([k,l])=>`<button class="chip ${quick===k?"on":""}" data-q="${k}" type="button">${l}</button>`).join("");const keep={status:$("#statusFilter").value,source:$("#sourceFilter").value,marketer:$("#marketerFilter").value};$("#statusFilter").innerHTML='<option value="">All follow-up statuses</option>'+FOLLOW.map(s=>`<option ${s===keep.status?"selected":""}>${esc(s)}</option>`).join("");const sources=[...new Set(cases.map(c=>c.sourceStatus).filter(Boolean))].sort();$("#sourceFilter").innerHTML='<option value="">All source statuses</option>'+sources.map(s=>`<option ${s===keep.source?"selected":""}>${esc(s)}</option>`).join("");const marketers=[...new Set(cases.map(c=>c.marketer||"Unassigned"))].sort();$("#marketerFilter").innerHTML='<option value="">All marketers</option>'+marketers.map(s=>`<option ${s===keep.marketer?"selected":""}>${esc(s)}</option>`).join("");$("#rows").innerHTML=list.map(c=>{const [lab,cls]=nextLabel(c,t);return `<tr data-id="${c.id}"><td><b>${esc(c.patientName||"Unnamed")}</b><span style="display:block;color:var(--muted);font-size:12px">File call: ${esc(c.callStatus||"—")}</span></td><td><span class="mono">${esc(c.gcrId||"—")}</span><span style="display:block;color:var(--muted);font-size:12px">${esc(c.phone||"No phone")}</span></td><td>${fmt(c.referralDate)}</td><td>${esc(c.marketer||"—")}</td><td>${badge(c.followStatus)}</td><td class="${cls}">${esc(lab)}<span style="display:block;color:var(--muted);font-size:12px;font-weight:400">${c.nextDate?fmt(c.nextDate):"—"}</span></td><td style="color:var(--muted)">${c.lastAction?"Worked":"Never worked"}</td></tr>`}).join("");$("#cards").innerHTML=list.map(c=>`<article class="card" data-id="${c.id}" style="padding:14px;margin-top:10px"><b>${esc(c.patientName||"Unnamed")}</b> ${badge(c.followStatus)}<div class="mono" style="margin-top:6px">${esc(c.gcrId||"No GCR")}</div><div style="color:var(--muted);margin-top:6px">${esc(c.phone||"No phone")}</div></article>`).join("");$("#empty").hidden=list.length>0;$("#empty").textContent=cases.length?"No cases match the current filters.":"Import a CSV or Excel file, or load the sample.";const focus=list.find(c=>!closed(c.followStatus));$("#upnext").innerHTML=focus?`<div><div class="label">Up next</div><h2 style="margin:4px 0">${esc(focus.patientName)}</h2><p style="color:var(--muted);margin:0">${esc(focus.gcrId||"No GCR")} · ${esc(focus.marketer||"No marketer")}</p><div style="margin-top:8px">${badge(focus.followStatus)}</div></div><button class="btn primary" id="workNext" type="button">Work this case</button>`:`<div><div class="label">Up next</div><h2 style="margin:4px 0">Nothing open in this view</h2></div>`;$("#workNext")?.addEventListener("click",()=>openCase(focus.id));
+}
+function openCase(id){const c=cases.find(x=>x.id===id);if(!c)return;activeId=id;$("#mName").textContent=c.patientName||"Unnamed";$("#mSub").textContent=[c.gcrId,c.sourceStatus&&"Source "+c.sourceStatus].filter(Boolean).join(" · ");$("#facts").innerHTML=[["Medicaid",c.medicaid],["Phone",c.phone],["Marketer",c.marketer],["Referral",fmt(c.referralDate)]].map(([a,b])=>`<div><div class="label">${a}</div><b>${esc(b||"—")}</b></div>`).join("");$("#editStatus").innerHTML=FOLLOW.map(s=>`<option ${s===c.followStatus?"selected":""}>${esc(s)}</option>`).join("");$("#nextDate").value=c.nextDate||"";$("#priority").value=c.priority||"Normal";$("#assigned").value=c.assigned||"";$("#newNote").value="";$("#timeline").innerHTML=(c.notes||[]).slice().reverse().map(n=>`<div class="note-item"><div class="label">${esc(n.at||"")}</div>${esc(n.text)}</div>`).join("")||'<p style="color:var(--muted)">No notes yet.</p>';$("#sheet").showModal()}
+function saveCase(){const c=cases.find(x=>x.id===activeId);if(!c)return;const prev=c.followStatus;c.followStatus=$("#editStatus").value;c.nextDate=$("#nextDate").value;c.priority=$("#priority").value;c.assigned=$("#assigned").value.trim();const note=$("#newNote").value.trim();if(note){c.notes=c.notes||[];c.notes.push({text:note,at:new Date().toISOString()});c.lastAction=new Date().toISOString()}else if(c.followStatus!==prev)c.lastAction=new Date().toISOString();save();$("#sheet").close();render()}
+function showApp(){$("#login").hidden=true;$("#app").hidden=false}function showLogin(){$("#login").hidden=false;$("#app").hidden=true;sessionStorage.removeItem("easyqad_logged_in")}
+$("#loginForm").onsubmit=e=>{e.preventDefault();if($("#username").value.trim()==="QAD"&&$("#password").value.trim()==="Saleem"){sessionStorage.setItem("easyqad_logged_in","1");showApp()}else{$("#loginError").textContent="Invalid username or password.";$("#password").value=""}};
+$("#logoutBtn").onclick=showLogin;$("#sampleBtn").onclick=()=>{if(!cases.length||confirm("Replace the caseload with the sample?"))sample()};
+$("#search").oninput=render;["statusFilter","sourceFilter","marketerFilter","priorityFilter"].forEach(id=>$("#"+id).onchange=()=>{if(id==="statusFilter")quick="all";render()});
+document.body.addEventListener("click",e=>{const q=e.target.closest("[data-q]");if(q){quick=q.dataset.q;$("#statusFilter").value="";render();return}const row=e.target.closest("[data-id]");if(row&&!e.target.closest("button"))openCase(row.dataset.id)});
+$("#saveCase").onclick=saveCase;
+$("#file").onchange=e=>{const f=e.target.files[0];e.target.value="";if(!f)return;const reader=new FileReader();reader.onload=ev=>{try{let rows;if(f.name.toLowerCase().endsWith(".csv"))rows=parseCsv(String(ev.target.result));else{const wb=XLSX.read(ev.target.result,{type:"array",cellDates:true});rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:"",raw:true})}const incoming=rowsToCases(rows);if(!incoming.length){alert("No patient rows found.");return}if(cases.length&&!confirm(`Merge ${incoming.length} rows? Notes and follow-up on matching people are kept.`))return;merge(incoming);render()}catch{alert("Could not read that file.")}};if(f.name.toLowerCase().endsWith(".csv"))reader.readAsText(f);else reader.readAsArrayBuffer(f)};
+$("#exportBtn").onclick=()=>{const rows=filtered().map(c=>({"Patient Name":c.patientName,"GCR ID":c.gcrId,Medicaid:c.medicaid,Phone:c.phone,Marketer:c.marketer,"Referral Date":c.referralDate,"Source Status":c.sourceStatus,"Call Status":c.callStatus,"Follow-up Status":c.followStatus,"Next Follow-up":c.nextDate,Priority:c.priority,"Assigned To":c.assigned,Notes:(c.notes||[]).map(n=>n.text).join(" | ")}));if(!rows.length)return;const ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Cases");XLSX.writeFile(wb,"easy-qad-export.xlsx")};
+if(sessionStorage.getItem("easyqad_logged_in")==="1")showApp();
+load();render();
+</script>
+</body>
+</html>
